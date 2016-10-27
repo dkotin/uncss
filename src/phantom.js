@@ -190,6 +190,15 @@ function getStylesheets(page, options) {
     });
 }
 
+function execute(page, code) {
+    return page.run(code , function (args) {
+        return this.evaluate(function(code){eval(code)}, args);
+    }).then(function (res) {
+        //console.log(res);
+        return res;
+    });
+}
+
 function getAll(page) {
     return page.run(null, function (args) {
         return this.evaluate(function () {
@@ -251,5 +260,6 @@ module.exports = {
     fromRemote: fromRemote,
     findAll: findAll,
     getAll: getAll,
-    getStylesheets: getStylesheets
+    getStylesheets: getStylesheets,
+    execute: execute
 };

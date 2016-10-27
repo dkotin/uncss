@@ -119,6 +119,31 @@ function getCSS(files, options, pages, stylesheets) {
     return [files, options, pages, utility.readStylesheets(stylesheets)];
 }
 
+/**
+ * provision images with width and height
+ *
+ * @param css
+ * @param pages
+ * @returns {*[]}
+ */
+function patchImages(css, pages) {
+    return promise.map( pages, function (page) {
+
+        var exec = function(){
+            document.getElementById("test1").innerHTML = "MAXISEL5";
+        };
+
+        var code = 'var execute = ' + exec + '; execute(); ';
+
+        return phantom.execute(page, code).then(function(result){
+            return result;
+        })
+    }).then(function success(response){
+        //return [css[0], response[0]];
+        return [css, pages];
+    });
+}
+
 function prepareResults(css, pages) {
     return promise.map( pages, function (page) {
         return phantom.getAll(page).then(function(result){
@@ -270,6 +295,7 @@ var serializedQueue = async.queue(function (opts, callback) {
                 .spread(getStylesheets)
                 .spread(getCSS)
                 .spread(processWithTextApi)
+                .spread(patchImages)
                 .spread(prepareResults);
         })
         .asCallback(callback, { spread: true });
