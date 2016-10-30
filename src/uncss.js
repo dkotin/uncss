@@ -130,7 +130,16 @@ function patchImages(css, pages) {
     return promise.map( pages, function (page) {
 
         var exec = function(){
-            document.getElementById("test1").innerHTML = "MAXISEL5";
+            var images = document.querySelectorAll("img");
+            for (var i in images){
+                var image = images[i];
+                if (typeof image == 'object' && image.getAttribute('width') == null){
+                    if (typeof image.width != 'undefined' && typeof image.height != 'undefined') {
+                        image.setAttribute('width', image.width);
+                        image.setAttribute('height', image.height);
+                    }
+                }
+            }
         };
 
         var code = 'var execute = ' + exec + '; execute(); ';
