@@ -80,7 +80,7 @@
     "is-html": "^1.0.0",
     "lodash": "^4.13.1",
     "object-assign": "^4.0.1",
-    "phridge": "git+ssh://git@github.com/dkotin/phridge.git",
+    "phridge": "https://github.com/dkotin/phridge.git",
     "postcss": "^5.0.21",
     "request": "^2.72.0"
   },
