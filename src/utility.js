@@ -146,9 +146,10 @@ function parseErrorMessage(error, cssStr) {
         if (lines.length) {
             /* We get the filename of the css file that contains the error */
             var i = error.line - 1;
+            var marker = '/*** CSS Filename:';
             while (i >= 0 && !error.filename) {
-                if (lines[i].substr(0, 21) === '/*** uncss> filename:') {
-                    error.filename = lines[i].substring(22, lines[i].length - 4);
+                if (lines[i].substr(0, marker.length) === marker) {
+                    error.filename = lines[i].substring(marker.length + 1, lines[i].length - (' STARTS ***/').length);
                     zeroLine = i;
                 }
                 i--;

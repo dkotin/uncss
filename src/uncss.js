@@ -197,8 +197,24 @@ function processWithTextApi(files, options, pages, stylesheets) {
      * - Remove the unused rules
      * - Return the optimized CSS as a string
      */
-    var cssStr = stylesheets.join(' \n'),
-        pcss, report;
+
+    var pcss, report, cleanCss;
+
+    var parseable = [];
+    var unparseable = [];
+    for (var i in stylesheets) {
+        try {
+            var tmpStyles = postcss.parse(stylesheets[i]);
+            parseable.push(stylesheets[i]);
+        } catch (err) {
+            unparseable.push(stylesheets[i]);
+        }
+    }
+
+    var cssStr = parseable.join(' \n');
+
+    unparseable = "/***** The styles below this line were not optimized due to errors. *****/\n" + unparseable.join(' \n');
+
     try {
         pcss = postcss.parse(cssStr);
     } catch (err) {
@@ -206,8 +222,8 @@ function processWithTextApi(files, options, pages, stylesheets) {
         throw utility.parseErrorMessage(err, cssStr);
     }
 
-    var cleanCss = uncss(pages, pcss, options.ignore).spread(function (css, rep) {
-        var newCssStr = '';
+    var newCssStr = '';
+    cleanCss = uncss(pages, pcss, options.ignore).spread(function (css, rep) {
         postcss.stringify(css, function(result) {
             newCssStr += result;
         });
@@ -215,11 +231,12 @@ function processWithTextApi(files, options, pages, stylesheets) {
         if (options.report) {
             report = {
                 original: cssStr,
-                selectors: rep
+                selectors: rep,
+                unparseable: unparseable
             };
         }
         return new promise(function (resolve) {
-            resolve([newCssStr, report]);
+            resolve([newCssStr + ' \n' + unparseable + 'aaa ', report]);
         });
     });
 
