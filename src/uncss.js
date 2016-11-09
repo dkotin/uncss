@@ -142,7 +142,7 @@ function patchImages(css, pages) {
             }
         };
 
-        var code = 'var execute = ' + exec + '; execute(); ';
+        var code = 'var executeWhatIWantNowExclusively15 = ' + exec + '; executeWhatIWantNowExclusively15(); ';
 
         return phantom.execute(page, code).then(function(result){
             return result;
