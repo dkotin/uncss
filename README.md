@@ -10,7 +10,7 @@
 UnCSS is a tool that removes unused CSS from your stylesheets.
 It works across multiple files and supports Javascript-injected CSS.
 
-## How?
+## How? 
 
 The process by which UnCSS removes the unused rules is as follows:
 
@@ -180,3 +180,4 @@ See [PostCSS docs](https://github.com/postcss/postcss) for examples for your env
 ## License
 
 Copyright (c) 2013 Giacomo Martino. See the [LICENSE](/LICENSE.md) file for license rights and limitations (MIT).
+
