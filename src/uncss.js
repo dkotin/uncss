@@ -11,8 +11,8 @@ var promise = require('bluebird'),
     postcss = require('postcss'),
     uncss = require('./lib.js'),
     utility = require('./utility.js'),
-    _ = require('lodash');
-
+    _ = require('lodash'),
+    PrettyCSS = require('PrettyCSS');
 /**
  * Get the contents of HTML pages through PhantomJS.
  * @param  {Array}   files   List of HTML files
@@ -163,6 +163,17 @@ function prepareResults(css, pages) {
     });
 }
 
+function checkIfCssParseable(stylesheet) {
+    var parseable = true;
+    try {
+        postcss.parse(stylesheet);
+    } catch (err) {
+        parseable = false;
+    }
+
+    return parseable;
+}
+
 /**
  * Do the actual work
  * @param  {Array}   files       List of HTML files
@@ -203,17 +214,25 @@ function processWithTextApi(files, options, pages, stylesheets) {
     var parseable = [];
     var unparseable = [];
     for (var i in stylesheets) {
-        try {
-            var tmpStyles = postcss.parse(stylesheets[i]);
-            parseable.push(stylesheets[i]);
-        } catch (err) {
-            unparseable.push(stylesheets[i]);
+        var sheet = stylesheets[i];
+        if(checkIfCssParseable(sheet)){
+            parseable.push(sheet);
+        } else {
+            var prettySheet = PrettyCSS.parse(sheet);
+            if (checkIfCssParseable(prettySheet)) {
+                parseable.push(prettySheet);
+            } else {
+                unparseable.push(stylesheets[i]);
+            }
         }
     }
 
     var cssStr = parseable.join(' \n');
-
-    unparseable = "/***** The styles below this line were not optimized due to errors. *****/\n" + unparseable.join(' \n');
+    if(unparseable.length > 0) {
+        unparseable = "/***** The styles below this line were not optimized due to errors. *****/\n" + unparseable.join(' \n');
+    } else {
+        unparseable = "";
+    }
 
     try {
         pcss = postcss.parse(cssStr);
@@ -236,7 +255,7 @@ function processWithTextApi(files, options, pages, stylesheets) {
             };
         }
         return new promise(function (resolve) {
-            resolve([newCssStr + ' \n' + unparseable + 'aaa ', report]);
+            resolve([newCssStr + ' \n' + unparseable, report]);
         });
     });
 
